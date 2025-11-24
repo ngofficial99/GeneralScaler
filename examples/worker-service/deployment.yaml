@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker-app
+  namespace: default
+  labels:
+    app: worker-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: worker-app
+  template:
+    metadata:
+      labels:
+        app: worker-app
+    spec:
+      containers:
+        - name: worker
+          image: python:3.11-slim
+          command:
+            - python
+            - -c
+            - |
+              import redis
+              import time
+              import os
+
+              r = redis.Redis(
+                  host=os.getenv('REDIS_HOST', 'redis'),
+                  port=int(os.getenv('REDIS_PORT', 6379)),
+                  decode_responses=True
+              )
+
+              print("Worker started, processing jobs from 'job-queue'")
+
+              while True:
+                  job = r.blpop('job-queue', timeout=5)
+                  if job:
+                      print(f"Processing job: {job[1]}")
+                      time.sleep(2)  # Simulate work
+                      print(f"Completed job: {job[1]}")
+                  else:
+                      time.sleep(1)
+          env:
+            - name: REDIS_HOST
+              value: redis
+            - name: REDIS_PORT
+              value: "6379"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+---
+# Redis for job queue
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          ports:
+            - containerPort: 6379
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: default
+spec:
+  selector:
+    app: redis
+  ports:
+    - protocol: TCP
+      port: 6379
+      targetPort: 6379
+  type: ClusterIP

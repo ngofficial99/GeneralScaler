@@ -1,0 +1,28 @@
+# Core operator framework
+kopf==1.37.2
+kubernetes==31.0.0
+
+# Metrics providers
+prometheus-api-client==0.5.5
+redis==5.2.1
+google-cloud-pubsub==2.26.1
+aiohttp==3.11.11
+
+# Additional utilities
+pydantic==2.10.4
+pyyaml==6.0.2
+python-json-logger==3.2.1
+
+# Testing
+pytest==8.3.4
+pytest-asyncio==0.24.0
+pytest-cov==6.0.0
+
+# Linting and formatting
+black==24.10.0
+flake8==7.1.1
+mypy==1.13.0
+types-PyYAML==6.0.12.20240917
+
+# Development
+ipython==8.18.1

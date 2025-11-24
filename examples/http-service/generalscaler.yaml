@@ -1,0 +1,43 @@
+apiVersion: autoscaling.generalscaler.io/v1alpha1
+kind: GeneralScaler
+metadata:
+  name: http-app-scaler
+  namespace: default
+spec:
+  # Target deployment to scale
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: http-app
+
+  # Replica constraints
+  minReplicas: 1
+  maxReplicas: 10
+
+  # Metric configuration - Using Prometheus to track request rate
+  metric:
+    type: prometheus
+    targetValue: 100  # Target: 100 requests per second per replica
+    prometheus:
+      serverUrl: http://prometheus-server.monitoring.svc.cluster.local
+      # Query: average request rate per pod over last 1 minute
+      query: 'sum(rate(http_requests_total{app="http-app"}[1m])) / count(up{app="http-app"})'
+
+  # Policy configuration - SLO-based for latency-sensitive app
+  policy:
+    type: slo
+    slo:
+      targetLatencyMs: 200
+      targetErrorRate: 0.01
+
+  # Scaling behavior
+  behavior:
+    scaleUp:
+      maxIncrement: 5        # Add max 5 pods at once
+      cooldownSeconds: 60    # Wait 60s between scale-ups
+    scaleDown:
+      maxDecrement: 2        # Remove max 2 pods at once
+      cooldownSeconds: 300   # Wait 5 minutes between scale-downs
+
+  # Check metrics every 30 seconds
+  syncIntervalSeconds: 30

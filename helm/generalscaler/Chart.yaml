@@ -1,0 +1,17 @@
+apiVersion: v2
+name: generalscaler
+description: A generic Kubernetes autoscaling operator with pluggable metrics and policies
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - autoscaling
+  - kubernetes
+  - operator
+  - hpa
+home: https://github.com/yourusername/generalscaler-operator
+sources:
+  - https://github.com/yourusername/generalscaler-operator
+maintainers:
+  - name: Your Name
+    email: your.email@example.com

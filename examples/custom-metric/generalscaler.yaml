@@ -1,0 +1,40 @@
+apiVersion: autoscaling.generalscaler.io/v1alpha1
+kind: GeneralScaler
+metadata:
+  name: custom-app-scaler
+  namespace: default
+spec:
+  # Target deployment to scale
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: custom-app
+
+  # Replica constraints
+  minReplicas: 1
+  maxReplicas: 15
+
+  # Metric configuration - Using custom HTTP endpoint
+  metric:
+    type: prometheus  # Use Prometheus for this example (can be extended to 'custom')
+    targetValue: 50   # Target: 50 active transactions per replica
+    prometheus:
+      serverUrl: http://metrics-server.default.svc.cluster.local
+      # For custom endpoint, you could extend to support custom HTTP calls
+      query: 'business_metric_value'
+
+  # Policy configuration - Simple proportional scaling
+  policy:
+    type: simple
+
+  # Scaling behavior - Balanced approach
+  behavior:
+    scaleUp:
+      maxIncrement: 3
+      cooldownSeconds: 60
+    scaleDown:
+      maxDecrement: 2
+      cooldownSeconds: 300
+
+  # Check metrics every 30 seconds
+  syncIntervalSeconds: 30

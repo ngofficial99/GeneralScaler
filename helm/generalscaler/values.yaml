@@ -1,0 +1,69 @@
+# Default values for generalscaler operator
+
+# Operator image configuration
+image:
+  repository: generalscaler/operator
+  tag: "0.1.0"
+  pullPolicy: IfNotPresent
+
+# Image pull secrets
+imagePullSecrets: []
+
+# Operator deployment configuration
+replicaCount: 1
+
+# Resource limits and requests
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# Node selector
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity rules
+affinity: {}
+
+# Service account name
+serviceAccount:
+  create: true
+  name: generalscaler-operator
+  annotations: {}
+
+# RBAC configuration
+rbac:
+  create: true
+
+# Namespace to watch (empty = all namespaces)
+watchNamespace: ""
+
+# Log level (DEBUG, INFO, WARNING, ERROR)
+logLevel: INFO
+
+# Security context
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+# Pod security context
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+
+# Environment variables
+env: []
+  # - name: CUSTOM_VAR
+  #   value: "value"
+
+# Extra labels for operator pods
+podLabels: {}
+
+# Extra annotations for operator pods
+podAnnotations: {}

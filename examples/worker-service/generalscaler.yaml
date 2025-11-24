@@ -1,0 +1,45 @@
+apiVersion: autoscaling.generalscaler.io/v1alpha1
+kind: GeneralScaler
+metadata:
+  name: worker-app-scaler
+  namespace: default
+spec:
+  # Target deployment to scale
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: worker-app
+
+  # Replica constraints
+  minReplicas: 1
+  maxReplicas: 20
+
+  # Metric configuration - Using Redis queue length
+  metric:
+    type: redis
+    targetValue: 10  # Target: max 10 jobs per worker
+    redis:
+      host: redis.default.svc.cluster.local
+      port: 6379
+      db: 0
+      queueName: job-queue
+
+  # Policy configuration - Cost-aware for batch processing
+  policy:
+    type: costAware
+    costAware:
+      maxMonthlyCost: 500          # Max $500/month
+      costPerPodPerHour: 0.05      # $0.05 per pod per hour
+      preferredScaleDirection: down # Prefer to scale down to save costs
+
+  # Scaling behavior
+  behavior:
+    scaleUp:
+      maxIncrement: 10       # Add max 10 workers at once for burst handling
+      cooldownSeconds: 30    # Quick scale-up for queue backlog
+    scaleDown:
+      maxDecrement: 5        # Remove max 5 workers at once
+      cooldownSeconds: 180   # Wait 3 minutes before scaling down
+
+  # Check queue length every 15 seconds
+  syncIntervalSeconds: 15

@@ -1,0 +1,84 @@
+{{- if .Values.rbac.create -}}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "generalscaler.serviceAccountName" . }}
+  labels:
+    {{- include "generalscaler.labels" . | nindent 4 }}
+  {{- with .Values.serviceAccount.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "generalscaler.fullname" . }}
+  labels:
+    {{- include "generalscaler.labels" . | nindent 4 }}
+rules:
+  # Framework: knowing which other operators are running (i.e. peering).
+  - apiGroups: [kopf.dev]
+    resources: [clusterkopfpeerings]
+    verbs: [list, watch, patch, get]
+
+  # Framework: runtime observation of namespaces & CRDs (addition/deletion).
+  - apiGroups: [apiextensions.k8s.io]
+    resources: [customresourcedefinitions]
+    verbs: [list, watch]
+  - apiGroups: [""]
+    resources: [namespaces]
+    verbs: [list, watch]
+
+  # Framework: admission webhook configuration management.
+  - apiGroups: [admissionregistration.k8s.io]
+    resources: [validatingwebhookconfigurations, mutatingwebhookconfigurations]
+    verbs: [create, patch]
+
+  # Application: read-write access to GeneralScaler resources.
+  - apiGroups: [autoscaling.generalscaler.io]
+    resources: [generalscalers]
+    verbs: [list, watch, get, patch]
+  - apiGroups: [autoscaling.generalscaler.io]
+    resources: [generalscalers/status]
+    verbs: [update, patch]
+
+  # Application: read access to pods and their status.
+  - apiGroups: [""]
+    resources: [pods, pods/status]
+    verbs: [list, watch, get]
+
+  # Application: read-write access to deployments for scaling.
+  - apiGroups: [apps]
+    resources: [deployments]
+    verbs: [get, list, watch, patch, update]
+  - apiGroups: [apps]
+    resources: [deployments/scale]
+    verbs: [get, patch, update]
+
+  # Application: read access to secrets for credentials.
+  - apiGroups: [""]
+    resources: [secrets]
+    verbs: [get, list, watch]
+
+  # Application: posting the events about the handlers progress/errors.
+  - apiGroups: [""]
+    resources: [events]
+    verbs: [create, patch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "generalscaler.fullname" . }}
+  labels:
+    {{- include "generalscaler.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "generalscaler.fullname" . }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "generalscaler.serviceAccountName" . }}
+    namespace: {{ .Release.Namespace }}
+{{- end }}
