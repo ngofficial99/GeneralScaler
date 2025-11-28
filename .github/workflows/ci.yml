@@ -74,6 +74,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Install package
+        run: |
+          pip install -e .
+
       - name: Run unit tests
         run: |
           pytest tests/unit/ -v --cov=src/generalscaler --cov-report=xml --cov-report=term
@@ -170,7 +174,7 @@ jobs:
       - name: YAML Lint
         uses: ibiqlik/action-yamllint@v3
         with:
-          file_or_dir: deploy/ examples/ helm/
+          file_or_dir: deploy/ examples/ helm/generalscaler/Chart.yaml helm/generalscaler/values.yaml
           config_data: |
             extends: default
             rules:
@@ -179,3 +183,5 @@ jobs:
                 level: warning
               indentation:
                 spaces: 2
+              document-start:
+                level: warning

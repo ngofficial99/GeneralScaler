@@ -150,7 +150,7 @@ class TestSafeScaler:
         # Cooldown is 60 seconds, so it should have expired
         is_in_cooldown = scaler._is_in_cooldown(
             namespace="default",
-            deployment_name="test-app",
+            name="test-app",
             cooldown_seconds=60,
             scale_direction="up",
         )
@@ -168,7 +168,7 @@ class TestSafeScaler:
         # Cooldown is 60 seconds, so it should still be active
         is_in_cooldown = scaler._is_in_cooldown(
             namespace="default",
-            deployment_name="test-app",
+            name="test-app",
             cooldown_seconds=60,
             scale_direction="up",
         )

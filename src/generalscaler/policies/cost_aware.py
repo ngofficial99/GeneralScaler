@@ -21,7 +21,9 @@ class CostAwarePolicy(ScalingPolicy):
         super().__init__(config)
         self.max_monthly_cost = config.get("maxMonthlyCost", float("inf"))
         self.cost_per_pod_per_hour = config.get("costPerPodPerHour", 0.0)
-        self.preferred_scale_direction = config.get("preferredScaleDirection", "balanced")
+        self.preferred_scale_direction = config.get(
+            "preferredScaleDirection", "balanced"
+        )
         # Scaling factors based on preference
         self.scale_up_factor = 1.0
         self.scale_down_factor = 1.0
@@ -123,7 +125,9 @@ class CostAwarePolicy(ScalingPolicy):
             base_desired = math.ceil(current_replicas * ratio * self.scale_down_factor)
 
         # Clamp to min/max bounds
-        desired_replicas = self._clamp_replicas(base_desired, min_replicas, max_replicas)
+        desired_replicas = self._clamp_replicas(
+            base_desired, min_replicas, max_replicas
+        )
 
         # Check budget constraint
         if not self._is_within_budget(desired_replicas):

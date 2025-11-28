@@ -1,3 +1,4 @@
+---
 apiVersion: v2
 name: generalscaler
 description: A generic Kubernetes autoscaling operator with pluggable metrics and policies

@@ -98,10 +98,13 @@ class TestRedisMetricProvider:
 
         # Mock redis client
         mock_client = AsyncMock()
-        mock_client.type = AsyncMock(return_value=b"list")
-        mock_client.llen = AsyncMock(return_value=10)
+        mock_client.type.return_value = b"list"
+        mock_client.llen.return_value = 10
 
-        with patch("redis.asyncio.from_url", return_value=mock_client):
+        async def mock_from_url(*args, **kwargs):
+            return mock_client
+
+        with patch("redis.asyncio.from_url", side_effect=mock_from_url):
             value = await provider.get_metric_value()
             assert value == 10.0
 
@@ -112,8 +115,11 @@ class TestRedisMetricProvider:
         provider = RedisMetricProvider(config)
 
         mock_client = AsyncMock()
-        mock_client.type = AsyncMock(return_value=b"none")
+        mock_client.type.return_value = b"none"
 
-        with patch("redis.asyncio.from_url", return_value=mock_client):
+        async def mock_from_url(*args, **kwargs):
+            return mock_client
+
+        with patch("redis.asyncio.from_url", side_effect=mock_from_url):
             value = await provider.get_metric_value()
             assert value == 0.0

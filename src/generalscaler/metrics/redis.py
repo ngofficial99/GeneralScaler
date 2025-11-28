@@ -72,9 +72,7 @@ class RedisMetricProvider(MetricProvider):
                 return None
 
             metric_value = float(queue_length)
-            self.logger.info(
-                f"Redis queue '{self.queue_name}' length: {metric_value}"
-            )
+            self.logger.info(f"Redis queue '{self.queue_name}' length: {metric_value}")
             return metric_value
 
         except aioredis.ConnectionError as e:

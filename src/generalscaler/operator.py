@@ -193,7 +193,9 @@ async def reconcile(spec, name, namespace, status, patch, **kwargs):
         # Get current replicas
         current_replicas = await scaler.get_current_replicas(namespace, deployment_name)
         if current_replicas is None:
-            logger.error(f"Failed to get current replicas for {namespace}/{deployment_name}")
+            logger.error(
+                f"Failed to get current replicas for {namespace}/{deployment_name}"
+            )
             patch.status["conditions"] = [
                 {
                     "type": "Ready",
@@ -288,7 +290,9 @@ async def reconcile(spec, name, namespace, status, patch, **kwargs):
                     }
                 ]
         else:
-            logger.debug(f"No scaling needed for {namespace}/{name}: {scale_decision.reason}")
+            logger.debug(
+                f"No scaling needed for {namespace}/{name}: {scale_decision.reason}"
+            )
             patch.status["conditions"] = [
                 {
                     "type": "Ready",
@@ -300,7 +304,9 @@ async def reconcile(spec, name, namespace, status, patch, **kwargs):
             ]
 
     except Exception as e:
-        logger.error(f"Error in reconciliation loop for {namespace}/{name}: {e}", exc_info=True)
+        logger.error(
+            f"Error in reconciliation loop for {namespace}/{name}: {e}", exc_info=True
+        )
         patch.status["conditions"] = [
             {
                 "type": "Ready",

@@ -54,7 +54,9 @@ class ScalingPolicy(ABC):
         """
         pass
 
-    def _clamp_replicas(self, replicas: int, min_replicas: int, max_replicas: int) -> int:
+    def _clamp_replicas(
+        self, replicas: int, min_replicas: int, max_replicas: int
+    ) -> int:
         """
         Ensure replicas is within min and max bounds.
 

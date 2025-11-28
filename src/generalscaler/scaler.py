@@ -150,7 +150,9 @@ class SafeScaler:
         max_change = max_increment if is_scale_up else max_decrement
 
         # Check cooldown
-        if self._is_in_cooldown(namespace, deployment_name, cooldown_seconds, scale_direction):
+        if self._is_in_cooldown(
+            namespace, deployment_name, cooldown_seconds, scale_direction
+        ):
             return ScaleDecision(
                 should_scale=False,
                 current_replicas=current_replicas,
